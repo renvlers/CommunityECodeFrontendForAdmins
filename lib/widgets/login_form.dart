@@ -59,13 +59,13 @@ class _LoginFormState extends State<LoginForm> {
             keyboardType: TextInputType.phone,
             controller: _usernameController,
             decoration: InputDecoration(
-              labelText: '手机号',
+              labelText: '物管电话号码',
               prefixIcon: Icon(Icons.person),
               border: OutlineInputBorder(),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return '请输入手机号';
+                return '请输入电话号码';
               }
               return null;
             },
@@ -156,16 +156,6 @@ class _LoginFormState extends State<LoginForm> {
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
-          ),
-          SizedBox(height: 8),
-          GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, RoutePath.resetPasswordPage);
-            },
-            child: Container(
-              alignment: Alignment.center,
-              child: Text("忘记密码？"),
             ),
           )
         ],
