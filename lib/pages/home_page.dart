@@ -163,6 +163,36 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.transparent,
                 child: Ink(
                   decoration: BoxDecoration(
+                      color: Colors.cyan,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.all(35),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Row(children: [
+                        Image.asset("assets/images/guest_record.png",
+                            width: 80, height: 80),
+                        Spacer(),
+                        const Text(
+                          "访客记录查询",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 24),
+                        )
+                      ]),
+                    ),
+                  ),
+                )),
+          ),
+          Container(
+            margin: const EdgeInsets.all(10),
+            child: Material(
+                color: Colors.transparent,
+                child: Ink(
+                  decoration: BoxDecoration(
                       color: Colors.purple,
                       borderRadius: BorderRadius.circular(10)),
                   child: InkWell(
