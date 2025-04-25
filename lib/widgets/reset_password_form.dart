@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_for_admins/pages/login_page.dart';
-import 'dart:async';
 
 import 'package:frontend_for_admins/utils/api_client.dart';
 import 'package:frontend_for_admins/utils/user_util.dart';
@@ -33,17 +32,18 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
           // 原密码
           TextFormField(
             controller: _originalPwdController,
-            obscureText: _obscureNewPwd,
+            obscureText: _obscureOriginalPwd,
             decoration: InputDecoration(
               labelText: '原密码',
               prefixIcon: Icon(Icons.lock),
               border: OutlineInputBorder(),
               suffixIcon: IconButton(
-                icon: Icon(
-                    _obscureNewPwd ? Icons.visibility_off : Icons.visibility),
+                icon: Icon(_obscureOriginalPwd
+                    ? Icons.visibility_off
+                    : Icons.visibility),
                 onPressed: () {
                   setState(() {
-                    _obscureNewPwd = !_obscureNewPwd;
+                    _obscureOriginalPwd = !_obscureOriginalPwd;
                   });
                 },
               ),
