@@ -173,7 +173,17 @@ class _HomePageState extends State<HomePage> {
                               ownerResponse.data['data']['username'];
                           String ownerPhone =
                               ownerResponse.data['data']['phone'];
-                          print(ownerName);
+                          Navigator.pushNamed(context, RoutePath.detailsPage,
+                              arguments: {
+                                'enterTime': enterTime,
+                                'leaveTime': leaveTime,
+                                'guestName': guestName,
+                                'guestPhone': guestPhone,
+                                'requestCode': requestCode,
+                                'qrCode': qrCode,
+                                'ownerName': ownerName,
+                                'ownerPhone': ownerPhone
+                              });
                         } on DioException catch (e) {
                           String errorMessage = e.toString();
                           if (e.response != null &&
