@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_for_admins/pages/home_page.dart';
 import 'package:frontend_for_admins/pages/login_page.dart';
+import 'package:frontend_for_admins/pages/qr_code_scanner_page.dart';
 import 'package:frontend_for_admins/pages/reset_password_page.dart';
 
 class Routes {
@@ -12,6 +13,8 @@ class Routes {
         return pageRoute(LoginPage(), settings: settings);
       case RoutePath.resetPasswordPage:
         return pageRoute(ResetPasswordPage(), settings: settings);
+      case RoutePath.qrCodeScannerPage:
+        return pageRoute(QrCodeScannerPage(), settings: settings);
     }
     return pageRoute(Scaffold(
       body: SafeArea(child: Center(child: Text("页面${settings.name}不存在"))),
@@ -38,4 +41,5 @@ class RoutePath {
   static const String homePage = "/home_page";
   static const String loginPage = "/login_page";
   static const String resetPasswordPage = "/reset_password_page";
+  static const String qrCodeScannerPage = "/qr_code_scanner_page";
 }

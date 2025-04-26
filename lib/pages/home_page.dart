@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_for_admins/pages/login_page.dart';
 import 'package:frontend_for_admins/routes/routes.dart';
+import 'package:frontend_for_admins/utils/api_client.dart';
 import 'package:frontend_for_admins/utils/user_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -76,7 +78,9 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.blue,
                       borderRadius: BorderRadius.circular(10)),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, RoutePath.qrCodeScannerPage);
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(35),
                       decoration: BoxDecoration(
@@ -106,7 +110,87 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(10)),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () async {
+                      String? code = await showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController codeController =
+                              TextEditingController();
+                          return AlertDialog(
+                            title: Text("请输入6位访问代码"),
+                            content: TextField(
+                              controller: codeController,
+                              maxLength: 6,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: "访问代码",
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // 取消
+                                },
+                                child: Text("取消"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  String code = codeController.text;
+                                  if (code.length == 6)
+                                    Navigator.of(context)
+                                        .pop(code); // 返回输入的访问代码
+                                  else
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("访问代码长度不能小于6位")),
+                                    );
+                                },
+                                child: Text("确定"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (code != null) {
+                        try {
+                          Response requestResponse = await ApiClient()
+                              .dio
+                              .get("/guest/check_request_by_code?code=$code");
+                          Response ownerResponse = await ApiClient().dio.get(
+                              "/user/get_user?uid=${requestResponse.data['data']['ownerId']}");
+                          DateTime enterTime = DateTime.parse(
+                              requestResponse.data['data']['enterTime']);
+                          DateTime leaveTime = DateTime.parse(
+                              requestResponse.data['data']['leaveTime']);
+                          String guestName =
+                              requestResponse.data['data']['guestName'];
+                          String guestPhone =
+                              requestResponse.data['data']['guestPhone'];
+                          String requestCode =
+                              requestResponse.data['data']['requestCode'];
+                          String qrCode = requestResponse.data['data']['hash'];
+                          String ownerName =
+                              ownerResponse.data['data']['username'];
+                          String ownerPhone =
+                              ownerResponse.data['data']['phone'];
+                          print(ownerName);
+                        } on DioException catch (e) {
+                          String errorMessage = e.toString();
+                          if (e.response != null &&
+                              e.response?.data != null &&
+                              e.response?.data['message'] != null) {
+                            errorMessage = e.response?.data['message'];
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(errorMessage)),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())),
+                          );
+                        }
+                      }
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(35),
                       decoration: BoxDecoration(
