@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend_for_admins/routes/routes.dart';
 import 'package:frontend_for_admins/utils/api_client.dart';
 import 'package:frontend_for_admins/utils/date_time_util.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailsCard extends StatefulWidget {
   final DateTime enterTime;
@@ -39,6 +41,108 @@ class _DetailsCardState extends State<DetailsCard> {
   late final String qrCode;
   late final String ownerName;
   late final String ownerPhone;
+
+  void _allowRequest() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('确认允许请求'),
+        content: Text('您确定要允许该访客进入吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('确定'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      Response response = await ApiClient().dio.post("/guest/allow_request",
+          data: {
+            "requestCode": requestCode,
+            "entrance": prefs.getInt("entrance")
+          });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.data['message'])),
+      );
+      Navigator.pushNamedAndRemoveUntil(
+          context, RoutePath.homePage, (route) => false);
+    } on DioException catch (e) {
+      String errorMessage = e.toString();
+      if (e.response != null &&
+          e.response?.data != null &&
+          e.response?.data['message'] != null) {
+        errorMessage = e.response?.data['message'];
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
+
+  void _refuseRequest() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('确认拒绝请求'),
+        content: Text('您确定要拒绝该访客进入吗？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('确定'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      Response response = await ApiClient().dio.post("/guest/refuse_request",
+          data: {
+            "requestCode": requestCode,
+            "entrance": prefs.getInt("entrance")
+          });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(response.data['message'])),
+      );
+      Navigator.pushNamedAndRemoveUntil(
+          context, RoutePath.homePage, (route) => false);
+    } on DioException catch (e) {
+      String errorMessage = e.toString();
+      if (e.response != null &&
+          e.response?.data != null &&
+          e.response?.data['message'] != null) {
+        errorMessage = e.response?.data['message'];
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -91,7 +195,7 @@ class _DetailsCardState extends State<DetailsCard> {
               SizedBox(height: 10),
               Row(children: [
                 ElevatedButton.icon(
-                    onPressed: () async {},
+                    onPressed: _allowRequest,
                     icon: Icon(Icons.check, color: Colors.green),
                     label: Text("允许", style: TextStyle(color: Colors.green)),
                     style: ButtonStyle(
@@ -100,7 +204,7 @@ class _DetailsCardState extends State<DetailsCard> {
                             borderRadius: BorderRadius.circular(7))))),
                 Spacer(),
                 ElevatedButton.icon(
-                    onPressed: () async {},
+                    onPressed: _refuseRequest,
                     icon: Icon(Icons.close, color: Colors.red),
                     label: Text("拒绝", style: TextStyle(color: Colors.red)),
                     style: ButtonStyle(

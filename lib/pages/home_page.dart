@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:frontend_for_admins/entities/entrance.dart';
 import 'package:frontend_for_admins/pages/login_page.dart';
 import 'package:frontend_for_admins/routes/routes.dart';
 import 'package:frontend_for_admins/utils/api_client.dart';
+import 'package:frontend_for_admins/utils/entrances_list.dart';
 import 'package:frontend_for_admins/utils/user_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -337,6 +339,38 @@ class _HomePageState extends State<HomePage> {
                           ]),
                       Spacer(),
                     ])),
+                SizedBox(height: 16),
+                Text("当前入口"),
+                SizedBox(height: 8),
+                DropdownButtonFormField<int>(
+                  value: EntrancesList.entrances.isNotEmpty
+                      ? EntrancesList.entrances.first.id
+                      : null,
+                  items: EntrancesList.entrances
+                      .map((e) => DropdownMenuItem<int>(
+                            value: e.id,
+                            child: Text(e.name),
+                          ))
+                      .toList(),
+                  onChanged: (int? value) async {
+                    if (value != null) {
+                      final prefs = await SharedPreferences.getInstance();
+                      await prefs.setInt("entrance", value);
+                      setState(() {
+                        EntrancesList.entrances.sort((a, b) => a.id == value
+                            ? -1
+                            : b.id == value
+                                ? 1
+                                : a.id.compareTo(b.id));
+                      });
+                    }
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  ),
+                ),
                 SizedBox(height: 16),
                 Row(
                   children: [
