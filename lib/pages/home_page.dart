@@ -232,7 +232,96 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.green,
                       borderRadius: BorderRadius.circular(10)),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () async {
+                      String? phoneNumber = await showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController codeController =
+                              TextEditingController();
+                          return AlertDialog(
+                            title: Text("请输入访客手机号"),
+                            content: TextField(
+                              controller: codeController,
+                              maxLength: 11,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: "手机号",
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(); // 取消
+                                },
+                                child: Text("取消"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  String code = codeController.text;
+                                  if (code.length == 11)
+                                    Navigator.of(context)
+                                        .pop(code); // 返回输入的访问代码
+                                  else
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("请输入正确的手机号")),
+                                    );
+                                },
+                                child: Text("确定"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (phoneNumber != null) {
+                        try {
+                          Response requestResponse = await ApiClient().dio.get(
+                              "/guest/check_request_by_phone?phone=$phoneNumber");
+                          Response ownerResponse = await ApiClient().dio.get(
+                              "/user/get_user?uid=${requestResponse.data['data']['ownerId']}");
+                          DateTime enterTime = DateTime.parse(
+                              requestResponse.data['data']['enterTime']);
+                          DateTime leaveTime = DateTime.parse(
+                              requestResponse.data['data']['leaveTime']);
+                          String guestName =
+                              requestResponse.data['data']['guestName'];
+                          String guestPhone =
+                              requestResponse.data['data']['guestPhone'];
+                          String requestCode =
+                              requestResponse.data['data']['requestCode'];
+                          String qrCode = requestResponse.data['data']['hash'];
+                          String ownerName =
+                              ownerResponse.data['data']['username'];
+                          String ownerPhone =
+                              ownerResponse.data['data']['phone'];
+                          Navigator.pushNamed(context, RoutePath.detailsPage,
+                              arguments: {
+                                'enterTime': enterTime,
+                                'leaveTime': leaveTime,
+                                'guestName': guestName,
+                                'guestPhone': guestPhone,
+                                'requestCode': requestCode,
+                                'qrCode': qrCode,
+                                'ownerName': ownerName,
+                                'ownerPhone': ownerPhone
+                              });
+                        } on DioException catch (e) {
+                          String errorMessage = e.toString();
+                          if (e.response != null &&
+                              e.response?.data != null &&
+                              e.response?.data['message'] != null) {
+                            errorMessage = e.response?.data['message'];
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(errorMessage)),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(e.toString())),
+                          );
+                        }
+                      }
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(35),
                       decoration: BoxDecoration(
