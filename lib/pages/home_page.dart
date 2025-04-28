@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend_for_admins/entities/entrance.dart';
 import 'package:frontend_for_admins/pages/login_page.dart';
 import 'package:frontend_for_admins/routes/routes.dart';
 import 'package:frontend_for_admins/utils/api_client.dart';
