@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_for_admins/routes/routes.dart';
@@ -11,6 +13,10 @@ class QrCodeScannerPage extends StatefulWidget {
 }
 
 class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
+  String? lastScannedQrCode;
+  bool isProcessing = false;
+  Timer? qrCodeResetTimer; // 新增一个Timer
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,58 +25,84 @@ class _QrCodeScannerPageState extends State<QrCodeScannerPage> {
           // 相机画面
           MobileScanner(
             onDetect: (capture) async {
-              // 这里可以处理扫描到的二维码
               final List<Barcode> barcodes = capture.barcodes;
-              if (barcodes.isNotEmpty) {
-                final String? qrCode = barcodes.first.rawValue;
-                if (qrCode != null) {
-                  // 例如：弹窗显示二维码内容
-                  try {
-                    Response requestResponse = await ApiClient()
-                        .dio
-                        .get("/guest/check_request_by_qr_code?qrCode=$qrCode");
-                    Response ownerResponse = await ApiClient().dio.get(
-                        "/user/get_user?uid=${requestResponse.data['data']['ownerId']}");
-                    DateTime enterTime = DateTime.parse(
-                        requestResponse.data['data']['enterTime']);
-                    DateTime leaveTime = DateTime.parse(
-                        requestResponse.data['data']['leaveTime']);
-                    String guestName =
-                        requestResponse.data['data']['guestName'];
-                    String guestPhone =
-                        requestResponse.data['data']['guestPhone'];
-                    String requestCode =
-                        requestResponse.data['data']['requestCode'];
-                    String qrCodeHash = requestResponse.data['data']['hash'];
-                    String ownerName = ownerResponse.data['data']['username'];
-                    String ownerPhone = ownerResponse.data['data']['phone'];
-                    Navigator.pushNamed(context, RoutePath.detailsPage,
-                        arguments: {
-                          'enterTime': enterTime,
-                          'leaveTime': leaveTime,
-                          'guestName': guestName,
-                          'guestPhone': guestPhone,
-                          'requestCode': requestCode,
-                          'qrCode': qrCodeHash,
-                          'ownerName': ownerName,
-                          'ownerPhone': ownerPhone
-                        });
-                  } on DioException catch (e) {
-                    String errorMessage = e.toString();
-                    if (e.response != null &&
-                        e.response?.data != null &&
-                        e.response?.data['message'] != null) {
-                      errorMessage = e.response?.data['message'];
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(errorMessage)),
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(e.toString())),
-                    );
-                  }
+              final String? qrCode =
+                  barcodes.isNotEmpty ? barcodes.first.rawValue : null;
+
+              if (qrCode == null) {
+                return;
+              }
+
+              // 【新增】每次扫到二维码，重置计时器
+              qrCodeResetTimer?.cancel();
+              qrCodeResetTimer = Timer(Duration(seconds: 1), () {
+                // 1秒后如果没有再次识别到同一个二维码，就清空记录
+                lastScannedQrCode = null;
+              });
+
+              if (isProcessing || qrCode == lastScannedQrCode) {
+                return;
+              }
+
+              isProcessing = true;
+              lastScannedQrCode = qrCode;
+
+              try {
+                Response requestResponse = await ApiClient()
+                    .dio
+                    .get("/guest/check_request_by_qr_code?qrCode=$qrCode");
+                Response ownerResponse = await ApiClient().dio.get(
+                    "/user/get_user?uid=${requestResponse.data['data']['ownerId']}");
+
+                MobileScannerController controller = MobileScannerController();
+                await controller.stop();
+
+                DateTime enterTime =
+                    DateTime.parse(requestResponse.data['data']['enterTime']);
+                DateTime leaveTime =
+                    DateTime.parse(requestResponse.data['data']['leaveTime']);
+                String guestName = requestResponse.data['data']['guestName'];
+                String guestPhone = requestResponse.data['data']['guestPhone'];
+                String requestCode =
+                    requestResponse.data['data']['requestCode'];
+                String qrCodeHash = requestResponse.data['data']['hash'];
+                String ownerName = ownerResponse.data['data']['username'];
+                String ownerPhone = ownerResponse.data['data']['phone'];
+
+                Navigator.of(context).pop();
+
+                isProcessing = false;
+
+                Navigator.pushNamed(
+                  context,
+                  RoutePath.detailsPage,
+                  arguments: {
+                    'enterTime': enterTime,
+                    'leaveTime': leaveTime,
+                    'guestName': guestName,
+                    'guestPhone': guestPhone,
+                    'requestCode': requestCode,
+                    'qrCode': qrCodeHash,
+                    'ownerName': ownerName,
+                    'ownerPhone': ownerPhone
+                  },
+                );
+              } on DioException catch (e) {
+                isProcessing = false;
+                String errorMessage = e.toString();
+                if (e.response != null &&
+                    e.response?.data != null &&
+                    e.response?.data['message'] != null) {
+                  errorMessage = e.response?.data['message'];
                 }
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(errorMessage)),
+                );
+              } catch (e) {
+                isProcessing = false;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(e.toString())),
+                );
               }
             },
           ),
