@@ -350,7 +350,9 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.cyan,
                       borderRadius: BorderRadius.circular(10)),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, RoutePath.guestRecordPage);
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(35),
                       decoration: BoxDecoration(
@@ -380,7 +382,9 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.purple,
                       borderRadius: BorderRadius.circular(10)),
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, RoutePath.registerPage);
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(35),
                       decoration: BoxDecoration(
