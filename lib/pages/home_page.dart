@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                             title: Text("请输入5位访问代码"),
                             content: TextField(
                               controller: codeController,
-                              maxLength: 6,
+                              maxLength: 5,
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 hintText: "访问代码",
