@@ -47,6 +47,8 @@ class _HomePageState extends State<HomePage> {
 
     if (loggedIn) {
       await _initializeUser();
+      if (EntrancesList.entrances.isEmpty)
+        await EntrancesList.generateList(context);
     }
   }
 

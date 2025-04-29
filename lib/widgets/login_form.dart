@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend_for_admins/routes/routes.dart';
 import 'package:frontend_for_admins/utils/api_client.dart';
-import 'package:frontend_for_admins/utils/entrances_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForm extends StatefulWidget {
@@ -126,7 +125,6 @@ class _LoginFormState extends State<LoginForm> {
                       int userId = response.data['data']['uid'];
                       print(userId);
                       await _saveLoginInfo(userId);
-                      await EntrancesList.generateList(context);
                       Navigator.pushReplacementNamed(
                           context, RoutePath.homePage);
                     } else {
