@@ -68,6 +68,9 @@ class _LoginFormState extends State<LoginForm> {
               if (value == null || value.isEmpty) {
                 return '请输入电话号码';
               }
+              if (value.length != 11) {
+                return '电话号码的长度应该为11位';
+              }
               return null;
             },
           ),
@@ -95,6 +98,9 @@ class _LoginFormState extends State<LoginForm> {
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return '请输入密码';
+              }
+              if (value.length < 6) {
+                return '密码长度不小于6位';
               }
               return null;
             },
