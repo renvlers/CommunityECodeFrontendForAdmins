@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                           TextEditingController codeController =
                               TextEditingController();
                           return AlertDialog(
-                            title: Text("请输入6位访问代码"),
+                            title: Text("请输入5位访问代码"),
                             content: TextField(
                               controller: codeController,
                               maxLength: 6,
@@ -137,12 +137,12 @@ class _HomePageState extends State<HomePage> {
                               TextButton(
                                 onPressed: () {
                                   String code = codeController.text;
-                                  if (code.length == 6)
+                                  if (code.length == 5)
                                     Navigator.of(context)
                                         .pop(code); // 返回输入的访问代码
                                   else
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("访问代码长度不能小于6位")),
+                                      SnackBar(content: Text("访问代码长度不能小于5位")),
                                     );
                                 },
                                 child: Text("确定"),
