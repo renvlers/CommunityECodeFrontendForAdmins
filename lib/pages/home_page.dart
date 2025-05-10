@@ -20,7 +20,6 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   int? uid;
-  String? username;
   String? phone;
   String? roomNumber;
 
@@ -37,9 +36,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _initializeUser() async {
     uid = await UserUtil.getUid() ?? 0;
-    username = await UserUtil.getName() ?? "";
     phone = await UserUtil.getPhoneNumber() ?? "";
-    roomNumber = await UserUtil.getRoomNumber() ?? "";
   }
 
   Future<void> _initializeHomePage() async {
@@ -213,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                             width: 80, height: 80),
                         Spacer(),
                         const Text(
-                          "访客代码验证",
+                          "访问代码验证",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -407,6 +404,38 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )),
           ),
+          Container(
+            margin: const EdgeInsets.all(10),
+            child: Material(
+                color: Colors.transparent,
+                child: Ink(
+                  decoration: BoxDecoration(
+                      color: Colors.pinkAccent,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pushNamed(context, RoutePath.aiAssistantPage);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(35),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Row(children: [
+                        Image.asset("assets/images/ai.png",
+                            width: 80, height: 80),
+                        Spacer(),
+                        const Text(
+                          "智能助手",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 24),
+                        )
+                      ]),
+                    ),
+                  ),
+                )),
+          )
         ]),
       ),
       SafeArea(
@@ -427,8 +456,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(username ?? "物管账号用户名",
-                                style: TextStyle(fontSize: 20)),
+                            Text("物管账号$uid", style: TextStyle(fontSize: 20)),
                             Text(phone ?? "物管电话号码"),
                           ]),
                       Spacer(),

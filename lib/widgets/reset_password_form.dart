@@ -122,7 +122,7 @@ class _ResetPasswordFormState extends State<ResetPasswordForm> {
                   try {
                     Response response = await ApiClient()
                         .dio
-                        .put("/user/change_password_without_code", data: {
+                        .put("/admin/change_password_without_code", data: {
                       "uid": await UserUtil.getUid(),
                       "originalPassword": _originalPwdController.text,
                       "newPassword": _newPwdController.text

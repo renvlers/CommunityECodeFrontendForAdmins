@@ -16,34 +16,11 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> _saveLoginInfo(int userId) async {
+  Future<void> _saveLoginInfo(int userId, String phone) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', true);
     await prefs.setInt('userId', userId);
-    try {
-      Response response =
-          await ApiClient().dio.get("/user/get_user?uid=${userId}");
-      if (response.statusCode == 200) {
-        await prefs.setString('username', response.data['data']['username']);
-        await prefs.setString('phone', response.data['data']['phone']);
-        await prefs.setString(
-            'roomNumber', response.data['data']['roomNumber']);
-      }
-    } on DioException catch (e) {
-      String errorMessage = e.toString();
-      if (e.response != null &&
-          e.response?.data != null &&
-          e.response?.data['message'] != null) {
-        errorMessage = e.response?.data['message'];
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    }
+    await prefs.setString('phone', phone);
   }
 
   bool _obscureText = true;
@@ -115,16 +92,14 @@ class _LoginFormState extends State<LoginForm> {
                   // 处理登录逻辑
                   try {
                     Response response =
-                        await ApiClient().dio.post("/user/login", data: {
+                        await ApiClient().dio.post("/admin/login_admin", data: {
                       "phone": _usernameController.text,
                       "password": _passwordController.text,
-                      "permission": 0
                     });
                     if (response.statusCode == 200 &&
                         response.data['message'] == "登录成功") {
                       int userId = response.data['data']['uid'];
-                      print(userId);
-                      await _saveLoginInfo(userId);
+                      await _saveLoginInfo(userId, _usernameController.text);
                       Navigator.pushReplacementNamed(
                           context, RoutePath.homePage);
                     } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_for_admins/pages/ai_assistant_page.dart';
 import 'package:frontend_for_admins/pages/details_page.dart';
 import 'package:frontend_for_admins/pages/guest_record_page.dart';
 import 'package:frontend_for_admins/pages/home_page.dart';
@@ -24,6 +25,8 @@ class Routes {
         return pageRoute(GuestRecordPage(), settings: settings);
       case RoutePath.registerPage:
         return pageRoute(RegisterPage(), settings: settings);
+      case RoutePath.aiAssistantPage:
+        return pageRoute(AiAssistantPage(), settings: settings);
     }
     return null;
   }
@@ -52,4 +55,5 @@ class RoutePath {
   static const String detailsPage = "/details_page";
   static const String guestRecordPage = "/guest_record_page";
   static const String registerPage = "/register_page";
+  static const String aiAssistantPage = "/ai_assistant_page";
 }

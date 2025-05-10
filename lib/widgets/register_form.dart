@@ -59,7 +59,6 @@ class _RegisterFormState extends State<RegisterForm> {
           SizedBox(height: 16),
           // 业主门牌号输入框
           TextFormField(
-            keyboardType: TextInputType.phone,
             controller: _roomNumberController,
             decoration: InputDecoration(
               labelText: '业主门牌号',
@@ -91,11 +90,11 @@ class _RegisterFormState extends State<RegisterForm> {
                       "username": _usernameController.text,
                       "password": _phoneController.text
                           .substring(_phoneController.text.length - 6),
-                      "permission": 1,
                       "roomNumber": _roomNumberController.text
                     });
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text("注册成功，初始密码为手机号后6位，请及时提醒业主修改密码")));
+                    Navigator.pop(context);
                   } on DioException catch (e) {
                     String errorMessage = e.toString();
                     if (e.response != null &&
